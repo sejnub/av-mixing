@@ -1,0 +1,31 @@
+desc:MIDI Velocity Control
+//tags: MIDI processing
+
+slider5:0<0,127,1>Lowest Key (MIDI Note #)
+slider6:127<0,127,1>Highest Key (MIDI Note #)
+
+@init
+
+@slider
+
+@block
+while (
+midirecv(ts,msg1,msg23) ? 
+(
+
+  m=msg1&240;
+  vel=(msg23/256)|0;
+  note=msg23&127;
+  
+  vel > 0 && note >= slider5 && note <= slider6 ? 
+    (
+      msg1 == 9*16                 ? midisend(ts, 8*16, note + 127*256);
+      msg1 == 8*16                 ? midisend(ts, 9*16, note +   1*256);
+      msg1 != 9*16 && msg1 != 8*16 ? midisend(ts, msg1, msg23         ); // passthru
+    ) : 
+    midisend(ts, msg1, msg23); // passthru
+    
+  bla=1;
+
+);
+);
